@@ -30,7 +30,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,7 +41,6 @@ public class UserController{
 	
 	private static Map<Integer,String> tokenMap = new HashMap<Integer,String>();
 	private static Map<Integer,Date> tokenTime = new HashMap<Integer,Date>();
-	private static int sysAdminToken;
 	
 	private static final int max_token=1000000;
 	private static final long max_validity_interval=12 * 60 * 60 * 1000;
@@ -51,7 +52,7 @@ public class UserController{
 	@Autowired
 	private Order_CommodityRepository order_CommodityRepository;
 	@Autowired
-	private Commodity_Picture commodity_picture;
+	private Commodity_PictureRepository commodity_pictureRepository;
 	@Autowired
 	private CommodityRepository commodityRepository;
 	@Autowired
@@ -64,7 +65,17 @@ public class UserController{
 	
 	
 	String getUserIDByToken(int token) {
-		return tokenMap.get(token);
+		String userID = tokenMap.get(token);
+		if (userID != null) {
+			Date nowTime=new Date();
+			long interval = nowTime.getTime() - tokenTime.get(token).getTime();
+			if (interval > max_validity_interval) {
+				tokenMap.remove(token);
+				tokenTime.remove(token);
+				userID = null;
+			}
+		}
+		return userID;
 	}
 	
 	String hash(String password) {
@@ -85,38 +96,18 @@ public class UserController{
 		Date nowTime=new Date();
 		Random rand=new Random();
 		int newToken=rand.nextInt(max_token);
-		while (tokenMap.get(newToken)!=null && newToken!=sysAdminToken) {
-			if (newToken == sysAdminToken) {
-				newToken = rand.nextInt(max_token);
-				continue;
-			}
+		while (tokenMap.get(newToken)!=null) {
 			Date t = tokenTime.get(newToken);
 			long interval = nowTime.getTime()-t.getTime();
-			if (interval > max_validity_interval) {
+			if (interval <= max_validity_interval) {
 				break;
 			}else {
+				tokenMap.remove(newToken);
+				tokenTime.remove(newToken);
 				newToken=rand.nextInt(max_token);
 			}
 		}
 		tokenMap.put(newToken, userID);
-		tokenTime.put(newToken,nowTime);
-		return newToken;
-	}
-	
-	int setTokenForSysAdmin() {
-		Date nowTime=new Date();
-		Random rand=new Random();
-		int newToken=rand.nextInt(max_token);
-		while (tokenMap.get(newToken)!=null) {
-			Date t = tokenTime.get(newToken);
-			long interval = nowTime.getTime()-t.getTime();
-			if (interval > max_validity_interval) {
-				break;
-			}else {
-				newToken=rand.nextInt(max_token);
-			}
-		}
-		sysAdminToken=newToken;
 		tokenTime.put(newToken,nowTime);
 		return newToken;
 	}
@@ -178,13 +169,12 @@ public class UserController{
 	}
 	
 	@ResponseBody
-	@PostMapping(path="/admin/info")
+	@PostMapping(path="/v1/system/admin/info")
 	public String getAllData(@RequestBody String jsonstr) {
 		System.out.println("get all data");
 		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
 		int token=jsonObject.getInteger("token");
-		String userID=tokenMap.get(token);
-		
+		String userID = getUserIDByToken(token);
 		JSONObject jsonRet = new JSONObject();
 		
 		if(userID!=null) {	
@@ -196,7 +186,7 @@ public class UserController{
 				userInfo.put("avatar",userRepository.findByUserid(userID).getUserpicture());
 				jsonRet.put("userInfo",userInfo);
 				
-				List<Orderr> orders=orderReoisitory.findAll();//订单
+				List<Orderr> orders=orderRepository.findAll();//订单
 				JSONArray list=new JSONArray();
 				int totalCount=orders.size();
 				int unfinishedCount=0;
@@ -212,16 +202,23 @@ public class UserController{
 					listitem.put("contact",order.getContact());
 					
 					userInfo=new JSONObject();
-					userInfo.put("nickname",userRepository.findByUserid(order.getUserID()).getUserNickname());
+					userInfo.put("nickname",userRepository.findByUserid(order.getUserID()).getNickname());
 					listitem.put("userInfo",userInfo);
 					
-					listitem.put("commodityID",order.getCommodityID());
+					JSONArray commodityList = new JSONArray();
+					List<Order_Commodity> oclist = order_CommodityRepository.findByOrderID(order.getOrderID());
 					
-					Order_Commodity order_Commodity=order_CommodityRepository.findById(new Order_CommodityPK(order.getOrderID(),order.getCommodityID()));
-					double transactionPrice=order_Commodity.getTransactionPrice();
-					int number=order_Commodity.getTransactionNumber();
-					listitem.put("transactionValue",transactionPrice);
-					listitem.put("number",number);
+					
+					int orderIncome=0;
+					for (int j=0;i<oclist.size();i++) {
+						Order_Commodity oc = oclist.get(j);
+						JSONObject commodityListItem = new JSONObject();
+						commodityListItem.put("commodityID", oc.getCommodityID());
+						commodityListItem.put("transactionValue", oc.getTransactionPrice());
+						commodityListItem.put("number", oc.getTransactionNumber());
+						commodityList.add(commodityListItem);
+						orderIncome += oc.getTransactionNumber()*oc.getTransactionPrice();
+					}		
 					
 					String state=order.getState();
 					listitem.put("state",state);
@@ -229,7 +226,7 @@ public class UserController{
 					list.add(listitem);
 					
 					if(state.equals("finished"))
-						income+=(transactionPrice*number);
+						income+=orderIncome;
 					else
 						unfinishedCount++;
 						
@@ -242,7 +239,7 @@ public class UserController{
 				
 				
 				
-				List<Commodity> commodities=commodityReoisitory.findAll();//在售商品
+				List<Commodity> commodities=commodityRepository.findAll();//在售商品
 				list=new JSONArray();
 				totalCount=commodities.size();
 				int notSoldOutCount=0;
@@ -273,14 +270,12 @@ public class UserController{
 					totalCount++;
 					if(stock>0) {
 					     notSoldOutCount++;
-						 }
-						
-									
+					}		
 				}
 				
 				commodityInfo.put("totalCount",totalCount);
-				commodityInfo.put("notSoldOutCount",unfinishedCount);
-				commodityInfo.put("maxCount",income);
+				commodityInfo.put("notSoldOutCount",notSoldOutCount);
+				commodityInfo.put("maxCount",maxCount);
 				commodityInfo.put("list",list);
 				
 				jsonRet.put("Order", orderInfo);
@@ -294,21 +289,25 @@ public class UserController{
 		}
 		else {
 			jsonRet.put("code", -1);
-			jsonRet.put("errMessage", "账号不存在");
+			jsonRet.put("errMessage", "token失效,请重新登陆");
 		}	
 		return jsonRet.toJSONString();
 	}
 	
 	@ResponseBody
-	@PutMapping(path="/user/{id}")
-	public String modifyUserInfo(@PathParam("id") String userID, @RequestBody String jsonstr) {
+	@PutMapping(path="/v1/system/user/{userid}")
+	public String modifyUserInfo(
+			@PathVariable(name = "userid",required = false) String userID,
+			@RequestBody String jsonstr) {
 		System.out.println("modify info: "+userID);
 		
 		JSONObject jsonRet = new JSONObject();
 		
 		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
 		int token=jsonObject.getInteger("token");
-		if(userID.equals(tokenMap.get(token))) {
+		String userIDFromToken = getUserIDByToken(token);
+
+		if(userIDFromToken!=null && userID.equals(userIDFromToken)) {
 			jsonRet.put("code", 0);
 			jsonRet.put("errMessage", "");
 			JSONObject userInfo=jsonObject.getJSONObject("userInfo");
@@ -316,15 +315,15 @@ public class UserController{
 			String nickname=userInfo.getString("nickname");
 			String password=userInfo.getString("password");
 			Long avatar=userInfo.getLong("avatar");
-			String avatarURL="";
+			
 			if(nickname!=null) 
 				user.setNickname(nickname);
 			
 			if(password!=null) 
-				user.setPassword(password);
+				user.setPassword(hash(password));
 				
 			if(avatar!=null) {
-				avatarURL=pictureRepository.findBy(avatar).getPictureURL();
+				String avatarURL=pictureRepository.findByPictureIndex(avatar).getPictureURL();
 				user.setUserpicture(avatarURL);
 			}
 			
@@ -334,58 +333,63 @@ public class UserController{
 			userInfo.put("id",user.getUserid());
 			userInfo.put("nickname", user.getNickname());
 			userInfo.put("type", user.getType());
-			userInfo.put("avatar", avatarURL);
+			userInfo.put("avatar", user.getUserpicture());
 			
 			jsonRet.put("user", userInfo);
 		}
 		else {
 			jsonRet.put("code", -1);
-			jsonRet.put("errMessage", "token不一致");
+			jsonRet.put("errMessage", "错误的id");
 		}
 		return jsonRet.toJSONString();
 	}
 	
     @ResponseBody	
-	@PutMapping(path="/admin/user/{id}")
-	public String sysModifyUser(@PathParam("id") String userID, @RequestBody String jsonstr) {
+	@PutMapping(path="/v1/system/admin/user/{userid}")
+	public String sysModifyUser(
+			@PathVariable(name = "userid",required = false) String userID, 
+			@RequestBody String jsonstr) {
 		System.out.println("sysAdmin modify info: "+userID);
 		
 		JSONObject jsonRet = new JSONObject();
 		
 		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
 		int token=jsonObject.getInteger("token");
-		if(token==sysAdminToken) {
-			jsonRet.put("code", 0);
-			jsonRet.put("errMessage", "");
+		String userIDFromToken = getUserIDByToken(token);
+		User sysAdmin = userRepository.findByUserid(userIDFromToken);
+		if (sysAdmin == null) {
+			jsonRet.put("code", -1);
+			jsonRet.put("errMessage", "token失效,请重新登陆");
+			return jsonRet.toJSONString();
+		}
+		if(sysAdmin.getType().equals("sysAdmin")) {
+
 			JSONObject userInfo=jsonObject.getJSONObject("userInfo");
 			User user=userRepository.findByUserid(userID);
-			String nickname=userInfo.getString("nickname");
+			if (user==null) {
+				jsonRet.put("code", -1);
+				jsonRet.put("errMessage", "用户不存在");
+				return jsonRet.toJSONString();
+			}
 			String password=userInfo.getString("password");
 			String type=userInfo.getString("type");
-			Long avatar=userInfo.getLong("avatar");
-			String avatarURL="";
-			if(nickname!=null) 
-				user.setNickname(nickname);
-				
+			jsonRet.put("code", 0);
+			jsonRet.put("errMessage", "");
+
 			if(password!=null) 
-				user.setPassword(password);
+				user.setPassword(hash(password));
 				
-			if(type!=null) 
+			if(type!=null) {
 				user.setType(type);
-				
-			if(avatar!=null) {
-				avatarURL=pictureRepository.findBy(avatar).getPictureURL();
-				user.setUserpicture(avatarURL);
 			}
-		    
+			
 			saveUser(user);
 			
 			userInfo=new JSONObject();
 			userInfo.put("id",user.getUserid());
 			userInfo.put("nickname", user.getNickname());
 			userInfo.put("type", user.getType());
-			userInfo.put("avatar", avatarURL);
-			
+			userInfo.put("avatar", user.getUserpicture());
 			jsonRet.put("user", userInfo);
 		}
 		else {
@@ -396,15 +400,19 @@ public class UserController{
 	}
     
 	@ResponseBody
-	@GetMapping(path="/system/admin/info")
-	public String sysGetInfo(@RequestBody String jsonstr) {
+	@GetMapping(path="/v1/system/admin/info")
+	public String sysGetInfo(
+			@RequestHeader("token") int token) {
 		System.out.println("sysAdmin get info");
-		
-        JSONObject jsonRet = new JSONObject();
-		
-		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
-		int token=jsonObject.getInteger("token");
-		if(token==sysAdminToken) {
+		JSONObject jsonRet = new JSONObject();
+		String userIDFromToken = getUserIDByToken(token);
+		User sysAdmin = userRepository.findByUserid(userIDFromToken);
+		if (sysAdmin == null) {
+			jsonRet.put("code", -1);
+			jsonRet.put("errMessage", "token失效,请重新登陆");
+			return jsonRet.toJSONString();
+		}
+		if(sysAdmin.getType().equals("sysAdmin")) {
 			jsonRet.put("code", 0);
 			jsonRet.put("errMessage", "");
 			List<User> allUsers=userRepository.findAll();
@@ -430,7 +438,7 @@ public class UserController{
 	}
 	
 	@ResponseBody
-	@DeleteMapping(path="/system/admin/user/{id}")
+	@DeleteMapping(path="/v1/system/admin/user/{id}")
 	public String sysDeleteUser(@PathParam("id") String userID,@RequestBody String jsonstr) {
 		System.out.println("delete user: "+userID);
 		
@@ -438,10 +446,23 @@ public class UserController{
 		
 		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
 		int token=jsonObject.getInteger("token");
-		if(token==sysAdminToken) {
-			jsonRet.put("code", 0);
-			jsonRet.put("errMessage", "");
-			userRepository.deleteById(userID);
+		String userIDFromToken = getUserIDByToken(token);
+		User sysAdmin = userRepository.findByUserid(userIDFromToken);
+		if (sysAdmin == null) {
+			jsonRet.put("code", -1);
+			jsonRet.put("errMessage", "token失效,请重新登陆");
+			return jsonRet.toJSONString();
+		}
+		if(sysAdmin.getType().equals("sysAdmin")) {
+			User user= userRepository.findByUserid(userID);
+			if (user==null) {
+				jsonRet.put("code", -1);
+				jsonRet.put("errMessage", "用户不存在");
+			}else {
+				jsonRet.put("code", 0);
+				jsonRet.put("errMessage", "");
+				//
+			}
 		}
 		else {
 			jsonRet.put("code", -1);

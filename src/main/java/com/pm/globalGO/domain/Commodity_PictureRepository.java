@@ -4,5 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface Commodity_PictureRepository extends JpaRepository<Commodity_Picture,Long>{
 
-	List<Commodity_Picture> findAll();
+	public List<Commodity_Picture> findAll();
+
+	public List<Commodity_Picture> findByCommodityID(Long commodityID);
 }

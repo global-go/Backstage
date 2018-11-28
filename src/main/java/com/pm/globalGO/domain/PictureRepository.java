@@ -4,5 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PictureRepository extends JpaRepository<Picture,Long>{
 
-	List<Picture> findAll();
+	public List<Picture> findAll();
+
+	public Picture findByPictureIndex(Long pictureIndex);
+
+	
 }

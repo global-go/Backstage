@@ -21,7 +21,6 @@ com\pm\globalGO\controller\PictureController.class
 com\pm\globalGO\controller\ResultBean.class
 com\pm\globalGO\controller\UserController.class
 com\pm\globalGO\domain\Order_Commodity.class
-com\pm\globalGO\controller\OrderController.class
 com\pm\globalGO\controller\OrderrController.class
 com\pm\globalGO\controller\Commodity_PictureController.class
 com\pm\globalGO\controller\CommodityController.class
