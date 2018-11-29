@@ -58,12 +58,6 @@ public class UserController{
 	@Autowired
 	private PictureRepository pictureRepository;
 	
-	
-	void saveUser(User user) {
-		userRepository.save(user);
-	}
-	
-	
 	String getUserIDByToken(int token) {
 		String userID = tokenMap.get(token);
 		if (userID != null) {
@@ -125,7 +119,7 @@ public class UserController{
 		if (user==null) {
 			String hashPassword = hash(password);
 			User newUser=new User(userID,"User"+userID,hashPassword,"",0,"user");
-			saveUser(newUser);
+			userRepository.save(newUser);
 			int newToken=setTokenForUserID(userID);
 			ret.put("code", 0);
 			ret.put("errMessage","");
@@ -326,8 +320,7 @@ public class UserController{
 				String avatarURL=pictureRepository.findByPictureIndex(avatar).getPictureURL();
 				user.setUserpicture(avatarURL);
 			}
-			
-			saveUser(user);
+			userRepository.save(user);
 			
 			userInfo=new JSONObject();
 			userInfo.put("id",user.getUserid());
@@ -383,7 +376,7 @@ public class UserController{
 				user.setType(type);
 			}
 			
-			saveUser(user);
+			userRepository.save(user);
 			
 			userInfo=new JSONObject();
 			userInfo.put("id",user.getUserid());
