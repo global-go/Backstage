@@ -289,7 +289,7 @@ public class UserController{
 	}
 	
 	@ResponseBody
-	@PutMapping(path="/v1/system/user/{userid}")
+	@PutMapping(path="/v1/user/{userid}")
 	public String modifyUserInfo(
 			@PathVariable(name = "userid",required = false) String userID,
 			@RequestBody String jsonstr) {
