@@ -163,7 +163,7 @@ public class UserController{
 	}
 	
 	@ResponseBody
-	@PostMapping(path="/v1/system/admin/info")
+	@PostMapping(path="/v1/admin/info")
 	public String getAllData(@RequestBody String jsonstr) {
 		System.out.println("get all data");
 		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
@@ -395,7 +395,7 @@ public class UserController{
 	@ResponseBody
 	@GetMapping(path="/v1/system/admin/info")
 	public String sysGetInfo(
-			@RequestHeader("token") int token) {
+			@RequestParam("token") int token) {
 		System.out.println("sysAdmin get info");
 		JSONObject jsonRet = new JSONObject();
 		String userIDFromToken = getUserIDByToken(token);
