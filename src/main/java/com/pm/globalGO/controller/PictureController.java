@@ -25,7 +25,7 @@ public class PictureController{
 	private PictureRepository pictureRepository;
 	
 	@ResponseBody
-	@PostMapping(path = "v1/images")
+	@PostMapping(path = "/v1/images")
 	public String uploadPic(@RequestParam("image") MultipartFile file) throws FileNotFoundException {
 		System.out.println("uploadPic");
 		JSONObject jsonRet = new JSONObject();
@@ -38,13 +38,13 @@ public class PictureController{
 			String suffix = fileName.substring(fileName.lastIndexOf("."));
 			ApplicationHome home = new ApplicationHome(getClass());
 			File jarFile=home.getSource();
-			String path =jarFile.getParent()+"/upload";
+			String path =jarFile.getParentFile().getParent()+"/upload";
 			File filePath = new File(path + "/" + imageID +suffix); 
 			if (!filePath.getParentFile().exists()) {
 				filePath.getParentFile().mkdirs();
 			}
 			try {
-				String url=filePath.getPath();
+				String url="/upload/"+imageID+suffix;
 				file.transferTo(filePath);
 				Picture pic = new Picture();
 				pic.setPictureIndex(imageID);
