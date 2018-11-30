@@ -14,13 +14,11 @@ public class Commodity_Picture implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	@Id
-	@GeneratedValue
 	private Long commodityID;
 	
 	@Id
 	private int pictureOrder;
 	
-	@GeneratedValue
 	@Column(nullable = false)
 	private Long pictureIndex;
 	

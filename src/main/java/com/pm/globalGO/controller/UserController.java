@@ -15,6 +15,8 @@ import com.pm.globalGO.domain.Commodity_PictureRepository;
 import com.pm.globalGO.domain.Order_Commodity;
 import com.pm.globalGO.domain.Order_CommodityPK;
 import com.pm.globalGO.domain.Order_CommodityRepository;
+import com.pm.globalGO.domain.Cart;
+import com.pm.globalGO.domain.CartRepository;
 import com.pm.globalGO.domain.Commodity;
 import com.pm.globalGO.domain.CommodityRepository;
 import com.pm.globalGO.domain.OrderrRepository;
@@ -57,8 +59,10 @@ public class UserController{
 	private CommodityRepository commodityRepository;
 	@Autowired
 	private PictureRepository pictureRepository;
+	@Autowired
+	private CartRepository cartRepository;
 	
-	String getUserIDByToken(int token) {
+	static String getUserIDByToken(int token) {
 		String userID = tokenMap.get(token);
 		if (userID != null) {
 			Date nowTime=new Date();
@@ -72,7 +76,7 @@ public class UserController{
 		return userID;
 	}
 	
-	String hash(String password) {
+	static String hash(String password) {
 		StringBuilder ret = new StringBuilder("");
 		for (int k=1;k<=20;k++) {
 			int t=0;
@@ -86,7 +90,7 @@ public class UserController{
 		return ret.toString();
 	}
 	
-	int setTokenForUserID(String userID) {
+	static int setTokenForUserID(String userID) {
 		Date nowTime=new Date();
 		Random rand=new Random();
 		int newToken=rand.nextInt(max_token);
@@ -106,7 +110,7 @@ public class UserController{
 		return newToken;
 	}
 	
-
+	//注册
 	@ResponseBody
 	@PostMapping(path = "/v1/register")
 	public String register(@RequestBody String jsonstr) {
@@ -132,6 +136,7 @@ public class UserController{
 		return ret.toJSONString();
 	}
 	
+	//登陆
 	@ResponseBody
 	@PostMapping(path = "/v1/login")
 	public String login(@RequestBody String jsonstr) {
@@ -142,7 +147,7 @@ public class UserController{
 		JSONObject ret = new JSONObject();
 		User user=userRepository.findByUserid(userID);
 		String hashPassword = hash(password);
-		if (user!=null && user.getPassword().equals(hashPassword)) {
+		if (user!=null && !user.getType().equals("sysAdmin") && user.getPassword().equals(hashPassword)) {
 				int newToken=setTokenForUserID(userID);
 				ret.put("code",0);
 				ret.put("errMessage","");
@@ -157,11 +162,36 @@ public class UserController{
 				ret.put("userInfo", userInfo);
 		}else {
 			ret.put("code",-1);
-			ret.put("errMessage","failde");
+			ret.put("errMessage","用户名或密码错误");
+		}
+		return ret.toJSONString();
+	}
+
+	//登陆(系统管理员)
+	@ResponseBody
+	@PostMapping(path = "/v1/system/admin/login")
+	public String sysLogin(@RequestBody String jsonstr) {
+		System.out.println("sysLogin");
+		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
+		String userID = jsonObject.getString("userID");
+		String password = jsonObject.getString("password");
+		JSONObject ret = new JSONObject();
+		User user=userRepository.findByUserid(userID);
+		String hashPassword = hash(password);
+		if (user!=null && user.getType().equals("sysAdmin") && user.getPassword().equals(hashPassword)) {
+				int newToken=setTokenForUserID(userID);
+				ret.put("code",0);
+				ret.put("errMessage","");
+				ret.put("token",newToken);
+		}else {
+			ret.put("code",-1);
+			ret.put("errMessage","用户名或密码错误");
 		}
 		return ret.toJSONString();
 	}
 	
+	
+	//后台信息
 	@ResponseBody
 	@PostMapping(path="/v1/admin/info")
 	public String getAllData(@RequestBody String jsonstr) {
@@ -288,6 +318,7 @@ public class UserController{
 		return jsonRet.toJSONString();
 	}
 	
+	//修改用户信息
 	@ResponseBody
 	@PutMapping(path="/v1/user/{userid}")
 	public String modifyUserInfo(
@@ -337,6 +368,7 @@ public class UserController{
 		return jsonRet.toJSONString();
 	}
 	
+	//修改用户信息(系统管理员)
     @ResponseBody	
 	@PutMapping(path="/v1/system/admin/user/{userid}")
 	public String sysModifyUser(
@@ -364,23 +396,28 @@ public class UserController{
 				jsonRet.put("errMessage", "用户不存在");
 				return jsonRet.toJSONString();
 			}
-			String password=userInfo.getString("password");
-			String type=userInfo.getString("type");
-			jsonRet.put("code", 0);
-			jsonRet.put("errMessage", "");
-
-			if(password!=null) 
+			
+			if (userInfo.containsKey("password")) {
+				String password=userInfo.getString("password");
 				user.setPassword(hash(password));
-				
-			if(type!=null) {
+			}
+			
+			if (userInfo.containsKey("type")) {
+				String type=userInfo.getString("type");
 				user.setType(type);
 			}
 			
+			if (userInfo.containsKey("balance")) {
+				double balance = userInfo.getDouble("balance");
+				user.setBalance(balance);
+			}
+
 			userRepository.save(user);
 			
 			userInfo=new JSONObject();
 			userInfo.put("id",user.getUserid());
 			userInfo.put("nickname", user.getNickname());
+			userInfo.put("balance",user.getBalance());
 			userInfo.put("type", user.getType());
 			userInfo.put("avatar", user.getUserpicture());
 			jsonRet.put("user", userInfo);
@@ -392,6 +429,7 @@ public class UserController{
 		return jsonRet.toJSONString();
 	}
     
+    //系统管理员信息
 	@ResponseBody
 	@GetMapping(path="/v1/system/admin/info")
 	public String sysGetInfo(
@@ -399,12 +437,12 @@ public class UserController{
 		System.out.println("sysAdmin get info");
 		JSONObject jsonRet = new JSONObject();
 		String userIDFromToken = getUserIDByToken(token);
-		User sysAdmin = userRepository.findByUserid(userIDFromToken);
-		if (sysAdmin == null) {
+		if (userIDFromToken == null) {
 			jsonRet.put("code", -1);
 			jsonRet.put("errMessage", "token失效,请重新登陆");
 			return jsonRet.toJSONString();
 		}
+		User sysAdmin = userRepository.findByUserid(userIDFromToken);
 		if(sysAdmin.getType().equals("sysAdmin")) {
 			jsonRet.put("code", 0);
 			jsonRet.put("errMessage", "");
@@ -430,31 +468,38 @@ public class UserController{
 		return jsonRet.toJSONString();
 	}
 	
+	//删除用户
 	@ResponseBody
 	@DeleteMapping(path="/v1/system/admin/user/{id}")
-	public String sysDeleteUser(@PathParam("id") String userID,@RequestBody String jsonstr) {
+	public String sysDeleteUser(
+			@PathVariable("id") String userID,
+			@RequestParam("token") int token
+			) {
 		System.out.println("delete user: "+userID);
-		
-        JSONObject jsonRet = new JSONObject();
-		
-		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
-		int token=jsonObject.getInteger("token");
+		JSONObject jsonRet = new JSONObject();
+
 		String userIDFromToken = getUserIDByToken(token);
-		User sysAdmin = userRepository.findByUserid(userIDFromToken);
-		if (sysAdmin == null) {
+		if (userIDFromToken == null) {
 			jsonRet.put("code", -1);
 			jsonRet.put("errMessage", "token失效,请重新登陆");
 			return jsonRet.toJSONString();
 		}
+		User sysAdmin = userRepository.findByUserid(userIDFromToken);
 		if(sysAdmin.getType().equals("sysAdmin")) {
 			User user= userRepository.findByUserid(userID);
 			if (user==null) {
 				jsonRet.put("code", -1);
 				jsonRet.put("errMessage", "用户不存在");
 			}else {
+				cartRepository.deleteByUserID(userID);
+				List<Orderr> orderList = orderRepository.findByUserID(userID);
+				for (int i=0;i<orderList.size();i++) {
+					Long orderID = orderList.get(i).getOrderID();
+					order_CommodityRepository.deleteByOrderID(orderID);
+				}
+				orderRepository.deleteByUserID(userID);
 				jsonRet.put("code", 0);
 				jsonRet.put("errMessage", "");
-				//
 			}
 		}
 		else {

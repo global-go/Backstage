@@ -1,9 +1,20 @@
 package com.pm.globalGO.domain;
 
 import java.io.Serializable;
+
+import javax.persistence.Column;
 public class Commodity_PicturePK implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
+	@Column(nullable = false)
 	private Long commodityID;
+	@Column(nullable = false)
 	private int pictureOrder;
+	
+	public Commodity_PicturePK() {
+		
+	}
+	
 	public Long getCommodityID() {
 		return commodityID;
 	}
