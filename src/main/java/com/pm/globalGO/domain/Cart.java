@@ -17,7 +17,6 @@ public class Cart implements Serializable{
 	private String userid;
 	
 	@Id
-	@GeneratedValue
 	private Long commodityid;
 	
 	@Column(nullable = false)

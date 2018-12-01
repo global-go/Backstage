@@ -1,5 +1,8 @@
 package com.pm.globalGO.controller;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -169,7 +172,43 @@ public class CommodityController{
 		return jsonRet.toJSONString();
 	}
 		
-
+	//首页信息
+	@ResponseBody
+	@GetMapping(path = "/v1/index/info")
+	public String index() {
+		System.out.println("IndexInfo");
+		JSONObject jsonRet = new JSONObject();
+		
+		List<Commodity> commodities=commodityRepository.findAll();
+		JSONArray list=new JSONArray();
+		
+		for(int i=0;i<commodities.size();i++) {
+			JSONObject listitem=new JSONObject();
+			Commodity commodity=commodities.get(i);
+			
+			listitem.put("name",commodity.getCommodityName());
+			listitem.put("price",commodity.getPrice());
+			listitem.put("stock",commodity.getStock());
+			listitem.put("description",commodity.getDescription());
+			
+			JSONArray images=new JSONArray();
+			List<Commodity_Picture> pictures=commodity_pictureRepository.findByCommodityid(commodity.getCommodityid());
+			for(int j=0;j<pictures.size();j++) {
+				JSONObject image=new JSONObject();
+			    image.put("id",pictures.get(j).getPictureorder());
+			    image.put("url",pictureRepository.findByPictureid(pictures.get(j).getPictureid()).getPictureUrl());
+			    images.add(image);
+			}
+			listitem.put("images",images);
+			list.add(listitem);
+		}
+		jsonRet.put("commodities",list);
+		jsonRet.put("code", 0);
+		jsonRet.put("errMessage", "");
+		
+		
+		return jsonRet.toJSONString();
+	}
 	
 		
 }
