@@ -212,10 +212,9 @@ public class UserController{
 				
 				List<Orderr> orders=orderRepository.findAll();//订单
 				JSONArray list=new JSONArray();
-				int totalCount=orders.size();
 				int unfinishedCount=0;
 				double income=0;
-				for(int i=0;i<totalCount;i++) {
+				for(int i=0;i<orders.size();i++) {
 					JSONObject listitem=new JSONObject();
 					Orderr order=orders.get(i);
 					
@@ -256,7 +255,7 @@ public class UserController{
 						
 				}
 				
-				orderInfo.put("totalCount",totalCount);
+				orderInfo.put("totalCount",orders.size());
 				orderInfo.put("unfinishedCount",unfinishedCount);
 				orderInfo.put("income",income);
 				orderInfo.put("list",list);
@@ -265,10 +264,9 @@ public class UserController{
 				
 				List<Commodity> commodities=commodityRepository.findAll();//在售商品
 				list=new JSONArray();
-				totalCount=commodities.size();
 				int notSoldOutCount=0;
 				int maxCount=50;//随便定的，再议
-				for(int i=0;i<totalCount;i++) {
+				for(int i=0;i<commodities.size();i++) {
 					JSONObject listitem=new JSONObject();
 					Commodity commodity=commodities.get(i);
 					
@@ -282,8 +280,8 @@ public class UserController{
 					List<Commodity_Picture> pictures=commodity_pictureRepository.findByCommodityid(commodity.getCommodityid());
 					for(int j=0;j<pictures.size();j++) {
 						JSONObject image=new JSONObject();
-					    image.put("id",pictures.get(i).getPictureorder());
-					    image.put("url",pictureRepository.findByPictureid(pictures.get(i).getPictureid()).getPictureUrl());
+					    image.put("id",pictures.get(j).getPictureorder());
+					    image.put("url",pictureRepository.findByPictureid(pictures.get(j).getPictureid()).getPictureUrl());
 					    images.add(image);
 					    
 					}
@@ -291,13 +289,13 @@ public class UserController{
 					listitem.put("images",images);
 					list.add(listitem);
 									
-					totalCount++;
+
 					if(stock>0) {
 					     notSoldOutCount++;
 					}		
 				}
 				
-				commodityInfo.put("totalCount",totalCount);
+				commodityInfo.put("totalCount",commodities.size());
 				commodityInfo.put("notSoldOutCount",notSoldOutCount);
 				commodityInfo.put("maxCount",maxCount);
 				commodityInfo.put("list",list);
