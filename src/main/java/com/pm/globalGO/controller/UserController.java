@@ -454,6 +454,7 @@ public class UserController{
 				userInfo.put("id",user.getUserid());
 				userInfo.put("nickname", user.getNickname());
 				userInfo.put("type", user.getType());
+				userInfo.put("balance",user.getBalance());
 				userInfo.put("avatar",user.getUserPicture());
 				users.add(userInfo);
 			}   
