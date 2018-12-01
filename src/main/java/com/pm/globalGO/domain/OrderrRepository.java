@@ -11,6 +11,8 @@ public interface OrderrRepository extends JpaRepository<Orderr,Long>{
 	@Transactional
 	void deleteByUserid(String userID);
 
+	Orderr findByOrderid(Long orderid);
+
 
 	
 }

@@ -122,7 +122,7 @@ public class UserController{
 		User user=userRepository.findByUserid(userID);
 		if (user==null) {
 			String hashPassword = hash(password);
-			User newUser=new User(userID,"User"+userID,hashPassword,"",0,"user");
+			User newUser=new User(userID,"User"+userID,hashPassword,"",1000.0,"user");
 			userRepository.save(newUser);
 			int newToken=setTokenForUserID(userID);
 			ret.put("code", 0);
@@ -211,7 +211,7 @@ public class UserController{
 				jsonRet.put("userInfo",userInfo);
 				
 				List<Orderr> orders=orderRepository.findAll();//订单
-				JSONArray list=new JSONArray();
+				JSONArray orderlist=new JSONArray();
 				int unfinishedCount=0;
 				double income=0;
 				for(int i=0;i<orders.size();i++) {
@@ -224,16 +224,16 @@ public class UserController{
 					listitem.put("addressee",order.getAddressee());
 					listitem.put("contact",order.getContact());
 					
-					userInfo=new JSONObject();
-					userInfo.put("nickname",userRepository.findByUserid(order.getUserid()).getNickname());
-					listitem.put("userInfo",userInfo);
+					JSONObject userInfo1=new JSONObject();
+					userInfo1.put("nickname",userRepository.findByUserid(order.getUserid()).getNickname());
+					listitem.put("userInfo",userInfo1);
 					
 					JSONArray commodityList = new JSONArray();
 					List<Order_Commodity> oclist = order_CommodityRepository.findByOrderid(order.getOrderid());
 					
 					
 					int orderIncome=0;
-					for (int j=0;i<oclist.size();i++) {
+					for (int j=0;j<oclist.size();j++) {
 						Order_Commodity oc = oclist.get(j);
 						JSONObject commodityListItem = new JSONObject();
 						commodityListItem.put("commodityID", oc.getCommodityid());
@@ -242,11 +242,12 @@ public class UserController{
 						commodityList.add(commodityListItem);
 						orderIncome += oc.getTransactionNumber()*oc.getTransactionPrice();
 					}		
+					listitem.put("commodityList",commodityList);
 					
 					String state=order.getState();
 					listitem.put("state",state);
 					
-					list.add(listitem);
+					orderlist.add(listitem);
 					
 					if(state.equals("finished"))
 						income+=orderIncome;
@@ -258,12 +259,12 @@ public class UserController{
 				orderInfo.put("totalCount",orders.size());
 				orderInfo.put("unfinishedCount",unfinishedCount);
 				orderInfo.put("income",income);
-				orderInfo.put("list",list);
+				orderInfo.put("list",orderlist);
 				
 				
 				
 				List<Commodity> commodities=commodityRepository.findAll();//在售商品
-				list=new JSONArray();
+				JSONArray commoditylist=new JSONArray();
 				int notSoldOutCount=0;
 				int maxCount=50;//随便定的，再议
 				for(int i=0;i<commodities.size();i++) {
@@ -287,7 +288,7 @@ public class UserController{
 					}
 					
 					listitem.put("images",images);
-					list.add(listitem);
+					commoditylist.add(listitem);
 									
 
 					if(stock>0) {
@@ -298,7 +299,7 @@ public class UserController{
 				commodityInfo.put("totalCount",commodities.size());
 				commodityInfo.put("notSoldOutCount",notSoldOutCount);
 				commodityInfo.put("maxCount",maxCount);
-				commodityInfo.put("list",list);
+				commodityInfo.put("list",commoditylist);
 				
 				jsonRet.put("Order", orderInfo);
 				jsonRet.put("Commodity",commodityInfo);

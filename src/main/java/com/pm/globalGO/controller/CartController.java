@@ -70,6 +70,7 @@ public class CartController{
 		return jsonRet.toJSONString();
 	}
 	
+	//获取购物车
 	@ResponseBody
 	@GetMapping(path="/v1/user/{userid}/cart")
 	public String getCart(

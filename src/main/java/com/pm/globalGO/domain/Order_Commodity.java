@@ -14,11 +14,9 @@ public class Order_Commodity implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue
 	private Long orderid;
 	
 	@Id
-	@GeneratedValue
 	private Long commodityid;
 	
 	@Column(nullable = false)
