@@ -155,7 +155,7 @@ public class UserController{
 				ret.put("unfinishedCount",0);
 				JSONObject userInfo = new JSONObject();
 				userInfo.put("id", user.getUserid());
-				userInfo.put("avatar", user.getUserpicture());
+				userInfo.put("avatar", user.getUserPicture());
 				userInfo.put("nickname",user.getNickname());
 				userInfo.put("type", user.getType());
 				userInfo.put("balance",user.getBalance());
@@ -207,7 +207,7 @@ public class UserController{
 				JSONObject orderInfo=new JSONObject();
 				JSONObject commodityInfo=new JSONObject();
 				
-				userInfo.put("avatar",userRepository.findByUserid(userID).getUserpicture());
+				userInfo.put("avatar",userRepository.findByUserid(userID).getUserPicture());
 				jsonRet.put("userInfo",userInfo);
 				
 				List<Orderr> orders=orderRepository.findAll();//订单
@@ -219,25 +219,25 @@ public class UserController{
 					JSONObject listitem=new JSONObject();
 					Orderr order=orders.get(i);
 					
-					listitem.put("id",order.getOrderID());
+					listitem.put("id",order.getOrderid());
 					listitem.put("time",order.getTime());
 					listitem.put("address",order.getAddress());
 					listitem.put("addressee",order.getAddressee());
 					listitem.put("contact",order.getContact());
 					
 					userInfo=new JSONObject();
-					userInfo.put("nickname",userRepository.findByUserid(order.getUserID()).getNickname());
+					userInfo.put("nickname",userRepository.findByUserid(order.getUserid()).getNickname());
 					listitem.put("userInfo",userInfo);
 					
 					JSONArray commodityList = new JSONArray();
-					List<Order_Commodity> oclist = order_CommodityRepository.findByOrderID(order.getOrderID());
+					List<Order_Commodity> oclist = order_CommodityRepository.findByOrderid(order.getOrderid());
 					
 					
 					int orderIncome=0;
 					for (int j=0;i<oclist.size();i++) {
 						Order_Commodity oc = oclist.get(j);
 						JSONObject commodityListItem = new JSONObject();
-						commodityListItem.put("commodityID", oc.getCommodityID());
+						commodityListItem.put("commodityID", oc.getCommodityid());
 						commodityListItem.put("transactionValue", oc.getTransactionPrice());
 						commodityListItem.put("number", oc.getTransactionNumber());
 						commodityList.add(commodityListItem);
@@ -279,11 +279,11 @@ public class UserController{
 					listitem.put("description",commodity.getDescription());
 					
 					JSONArray images=new JSONArray();
-					List<Commodity_Picture> pictures=commodity_pictureRepository.findByCommodityID(commodity.getCommodityID());
+					List<Commodity_Picture> pictures=commodity_pictureRepository.findByCommodityid(commodity.getCommodityid());
 					for(int j=0;j<pictures.size();j++) {
 						JSONObject image=new JSONObject();
-					    image.put("id",pictures.get(i).getPictureOrder());
-					    image.put("url",pictureRepository.findByPictureIndex(pictures.get(i).getPictureIndex()).getPictureURL());
+					    image.put("id",pictures.get(i).getPictureorder());
+					    image.put("url",pictureRepository.findByPictureid(pictures.get(i).getPictureid()).getPictureUrl());
 					    images.add(image);
 					    
 					}
@@ -348,8 +348,8 @@ public class UserController{
 				user.setPassword(hash(password));
 				
 			if(avatar!=null) {
-				String avatarURL=pictureRepository.findByPictureIndex(avatar).getPictureURL();
-				user.setUserpicture(avatarURL);
+				String avatarURL=pictureRepository.findByPictureid(avatar).getPictureUrl();
+				user.setUserPicture(avatarURL);
 			}
 			userRepository.save(user);
 			
@@ -357,7 +357,7 @@ public class UserController{
 			userInfo.put("id",user.getUserid());
 			userInfo.put("nickname", user.getNickname());
 			userInfo.put("type", user.getType());
-			userInfo.put("avatar", user.getUserpicture());
+			userInfo.put("avatar", user.getUserPicture());
 			
 			jsonRet.put("user", userInfo);
 		}
@@ -419,7 +419,7 @@ public class UserController{
 			userInfo.put("nickname", user.getNickname());
 			userInfo.put("balance",user.getBalance());
 			userInfo.put("type", user.getType());
-			userInfo.put("avatar", user.getUserpicture());
+			userInfo.put("avatar", user.getUserPicture());
 			jsonRet.put("user", userInfo);
 		}
 		else {
@@ -456,7 +456,7 @@ public class UserController{
 				userInfo.put("id",user.getUserid());
 				userInfo.put("nickname", user.getNickname());
 				userInfo.put("type", user.getType());
-				userInfo.put("avatar",user.getUserpicture());
+				userInfo.put("avatar",user.getUserPicture());
 				users.add(userInfo);
 			}   
 			jsonRet.put("users", users);
@@ -491,13 +491,13 @@ public class UserController{
 				jsonRet.put("code", -1);
 				jsonRet.put("errMessage", "用户不存在");
 			}else {
-				cartRepository.deleteByUserID(userID);
-				List<Orderr> orderList = orderRepository.findByUserID(userID);
+				cartRepository.deleteByUserid(userID);
+				List<Orderr> orderList = orderRepository.findByUserid(userID);
 				for (int i=0;i<orderList.size();i++) {
-					Long orderID = orderList.get(i).getOrderID();
-					order_CommodityRepository.deleteByOrderID(orderID);
+					Long orderID = orderList.get(i).getOrderid();
+					order_CommodityRepository.deleteByOrderid(orderID);
 				}
-				orderRepository.deleteByUserID(userID);
+				orderRepository.deleteByUserid(userID);
 				jsonRet.put("code", 0);
 				jsonRet.put("errMessage", "");
 			}

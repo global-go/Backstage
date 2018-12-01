@@ -7,24 +7,24 @@ public class Commodity_PicturePK implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Column(nullable = false)
-	private Long commodityID;
+	private Long commodityid;
 	@Column(nullable = false)
-	private int pictureOrder;
+	private int pictureorder;
 	
 	public Commodity_PicturePK() {
 		
 	}
 	
-	public Long getCommodityID() {
-		return commodityID;
+	public Long getCommodityid() {
+		return commodityid;
 	}
-	public void setCommodityID(Long commodityID) {
-		this.commodityID=commodityID;
+	public void setCommodityid(Long commodityID) {
+		this.commodityid=commodityID;
 	}
-	public int getPictureOrder() {
-		return pictureOrder;
+	public int getPictureorder() {
+		return pictureorder;
 	}
-	public void setPictureOrder(int pictureOrder) {
-		this.pictureOrder=pictureOrder;
+	public void setPictureorder(int pictureOrder) {
+		this.pictureorder=pictureOrder;
 	}
 }

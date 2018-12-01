@@ -14,11 +14,11 @@ public class Cart implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	@Id
-	private String userID;
+	private String userid;
 	
 	@Id
 	@GeneratedValue
-	private Long commodityID;
+	private Long commodityid;
 	
 	@Column(nullable = false)
 	private int cartNumber;
@@ -30,21 +30,21 @@ public class Cart implements Serializable{
 	public Cart(String userID,Long commodityID,int cartNumber)
 	{
 		super();
-		this.userID=userID;
-		this.commodityID=commodityID;
+		this.userid=userID;
+		this.commodityid=commodityID;
 		this.cartNumber=cartNumber;
 	}
-	public String getUserID() {
-		return userID;
+	public String getUserid() {
+		return userid;
 	}
-	public void setUserID(String userID) {
-		this.userID=userID;
+	public void setUserid(String userID) {
+		this.userid=userID;
 	}
-	public Long getCommodityID() {
-		return commodityID;
+	public Long getCommodityid() {
+		return commodityid;
 	}
-	public void setCommodityID(Long commodityID) {
-		this.commodityID=commodityID;
+	public void setCommodityid(Long commodityID) {
+		this.commodityid=commodityID;
 	}
 	public int getCartNumber() {
 		return cartNumber;

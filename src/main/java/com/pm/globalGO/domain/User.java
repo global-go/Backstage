@@ -12,21 +12,22 @@ public class User implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	@Id
+	@Column
 	private String userid;
 	
-	@Column(nullable = false)
+	@Column
 	private String nickname;
 	
-	@Column(nullable = false)
+	@Column
 	private String password;
 	
-	@Column(nullable = false)
-	private String userpicture;
+	@Column
+	private String userPicture;
 	
-	@Column(nullable = false)
+	@Column
 	private double balance;
 	
-	@Column(nullable = false)
+	@Column
 	private String type;
 	
 	public User() {
@@ -37,7 +38,7 @@ public class User implements Serializable{
 		this.userid=userid;
 		this.nickname=nickname;
 		this.password=password;
-		this.userpicture=userpicture;
+		this.userPicture=userpicture;
 		this.balance=balance;
 		this.type=type;
 	}
@@ -45,38 +46,37 @@ public class User implements Serializable{
 		return userid;
 	}
 	public void setUserid(String userid) {
-		this.userid=userid;
+		this.userid = userid;
 	}
 	public String getNickname() {
 		return nickname;
 	}
 	public void setNickname(String nickname) {
-		this.nickname=nickname;
+		this.nickname = nickname;
 	}
 	public String getPassword() {
 		return password;
 	}
 	public void setPassword(String password) {
-		this.password=password;
+		this.password = password;
 	}
-	public String getUserpicture() {
-		return userpicture;
+	public String getUserPicture() {
+		return userPicture;
 	}
-	public void setUserpicture(String userpicture) {
-		this.userpicture=userpicture;
+	public void setUserPicture(String userpicture) {
+		this.userPicture = userpicture;
 	}
-	
 	public double getBalance() {
 		return balance;
 	}
 	public void setBalance(double balance) {
-		this.balance=balance;
+		this.balance = balance;
 	}
-	
 	public String getType() {
 		return type;
 	}
 	public void setType(String type) {
-		this.type=type;
+		this.type = type;
 	}
+	
 }

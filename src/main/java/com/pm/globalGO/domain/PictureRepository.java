@@ -6,7 +6,7 @@ public interface PictureRepository extends JpaRepository<Picture,Long>{
 
 	public List<Picture> findAll();
 
-	public Picture findByPictureIndex(Long pictureIndex);
+	public Picture findByPictureid(Long pictureIndex);
 
 	
 }

@@ -2,18 +2,18 @@ package com.pm.globalGO.domain;
 
 import java.io.Serializable;
 public class Order_CommodityPK implements Serializable {
-	private Long orderID;
-	private Long commodityID;
-	public Long getOrderID() {
-		return orderID;
+	private Long orderid;
+	private Long commodityid;
+	public Long getOrderid() {
+		return orderid;
 	}
-	public void setOrderID(Long orderID) {
-		this.orderID=orderID;
+	public void setOrderid(Long orderID) {
+		this.orderid=orderID;
 	}
-	public Long getCommodityID() {
-		return commodityID;
+	public Long getCommodityid() {
+		return commodityid;
 	}
-	public void setCommodityID(Long commodityID) {
-		this.commodityID=commodityID;
+	public void setCommodityid(Long commodityID) {
+		this.commodityid=commodityID;
 	}
 }

@@ -12,7 +12,7 @@ public class Commodity implements Serializable{
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue
-	private Long commodityID;
+	private Long commodityid;
 	
 	@Column(nullable = false)
 	private String commodityName;
@@ -38,7 +38,7 @@ public class Commodity implements Serializable{
 	
 	public Commodity(Long commodityID,String commodityName,double price,int stock,String description,int pictureNumber) {
 		super();
-		this.commodityID=commodityID;
+		this.commodityid=commodityID;
 		this.commodityName=commodityName;
 		this.price=price;
 		this.stock=stock;
@@ -46,11 +46,11 @@ public class Commodity implements Serializable{
 		this.pictureNumber=pictureNumber;
 	}
 
-	public Long getCommodityID() {
-		return commodityID;
+	public Long getCommodityid() {
+		return commodityid;
 	}
-	public void setCommodityID(Long commodityID) {
-		this.commodityID=commodityID;
+	public void setCommodityid(Long commodityID) {
+		this.commodityid=commodityID;
 	}
 	
 	public String getCommodityName() {

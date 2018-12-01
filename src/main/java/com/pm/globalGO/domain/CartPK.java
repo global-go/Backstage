@@ -4,19 +4,19 @@ import java.io.Serializable;
 
 public class CartPK implements Serializable{
 
-	private String userID;
-	private Long commodityID;
+	private String userid;
+	private Long commodityid;
 	
 	public String getUserID() {
-		return userID;
+		return userid;
 	}
-	public void setUserID(String userID) {
-		this.userID=userID;
+	public void setUserid(String userID) {
+		this.userid=userID;
 	}
-	public Long getCommodityID() {
-		return commodityID;
+	public Long getCommodityid() {
+		return commodityid;
 	}
-	public void setCommodityID(Long commodityID) {
-		this.commodityID=commodityID;
+	public void setCommodityid(Long commodityID) {
+		this.commodityid=commodityID;
 	}
 }

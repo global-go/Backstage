@@ -14,39 +14,39 @@ public class Commodity_Picture implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	@Id
-	private Long commodityID;
+	private Long commodityid;
 	
 	@Id
-	private int pictureOrder;
+	private int pictureorder;
 	
 	@Column(nullable = false)
-	private Long pictureIndex;
+	private Long pictureid;
 	
 	public Commodity_Picture() {
 		super();
 	}
 	public Commodity_Picture(Long commodityID,int pictureOrder,Long pictureIndex) {
 		super();
-		this.commodityID=commodityID;
-		this.pictureOrder=pictureOrder;
-		this.pictureIndex=pictureIndex;
+		this.commodityid=commodityID;
+		this.pictureorder=pictureOrder;
+		this.pictureid=pictureIndex;
 	}
-	public Long getCommodityID() {
-		return commodityID;
+	public Long getCommodityid() {
+		return commodityid;
 	}
-	public void setCommodityID(Long commodityID) {
-		this.commodityID=commodityID;
+	public void setCommodityid(Long commodityID) {
+		this.commodityid=commodityID;
 	}
-	public int getPictureOrder() {
-		return pictureOrder;
+	public int getPictureorder() {
+		return pictureorder;
 	}
-	public void setPictureOrder(int pictureOrder) {
-		this.pictureOrder=pictureOrder;
+	public void setPictureorder(int pictureOrder) {
+		this.pictureorder=pictureOrder;
 	}
-	public Long getPictureIndex() {
-		return pictureIndex;
+	public Long getPictureid() {
+		return pictureid;
 	}
-	public void setPictureIndex(Long pictureIndex) {
-		this.pictureIndex=pictureIndex;
+	public void setPictureid(Long pictureIndex) {
+		this.pictureid=pictureIndex;
 	}
 }

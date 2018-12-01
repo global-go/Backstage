@@ -11,10 +11,10 @@ public class Picture implements Serializable{
 	
 	@Id
 	@GeneratedValue
-	private Long pictureIndex;
+	private Long pictureid;
 	
 	@Column(nullable = false)
-	private String pictureURL;
+	private String pictureUrl;
 
 	public Picture() {
 		super();
@@ -22,19 +22,19 @@ public class Picture implements Serializable{
 	
 	public Picture(Long pictureIndex,String pictureURL) {
 		super();
-		this.pictureIndex=pictureIndex;
-		this.pictureURL=pictureURL;
+		this.pictureid=pictureIndex;
+		this.pictureUrl=pictureURL;
 	}
-	public Long getPictureIndex() {
-		return pictureIndex;
+	public Long getPictureid() {
+		return pictureid;
 	}
-	public void setPictureIndex(Long pictureIndex) {
-		this.pictureIndex=pictureIndex;
+	public void setPictureid(Long pictureIndex) {
+		this.pictureid=pictureIndex;
 	}
-	public String getPictureURL() {
-		return pictureURL;
+	public String getPictureUrl() {
+		return pictureUrl;
 	}
-	public void setPictureURL(String pictureURL) {
-		this.pictureURL=pictureURL;
+	public void setPictureUrl(String pictureURL) {
+		this.pictureUrl=pictureURL;
 	}
 }

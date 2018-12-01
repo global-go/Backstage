@@ -6,10 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface OrderrRepository extends JpaRepository<Orderr,Long>{
 
-	List<Orderr> findByUserID(String userID);
+	List<Orderr> findByUserid(String userID);
 
 	@Transactional
-	void deleteByUserID(String userID);
+	void deleteByUserid(String userID);
 
 
 	

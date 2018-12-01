@@ -15,11 +15,11 @@ public class Order_Commodity implements Serializable{
 	
 	@Id
 	@GeneratedValue
-	private Long orderID;
+	private Long orderid;
 	
 	@Id
 	@GeneratedValue
-	private Long commodityID;
+	private Long commodityid;
 	
 	@Column(nullable = false)
 	private double transactionPrice;
@@ -32,22 +32,22 @@ public class Order_Commodity implements Serializable{
 	}
 	public Order_Commodity(Long orderID,Long commodityID,double transactionPrice,int transactionNumber) {
 		super();
-		this.orderID=orderID;
-		this.commodityID=commodityID;
+		this.orderid=orderID;
+		this.commodityid=commodityID;
 		this.transactionPrice=transactionPrice;
 		this.transactionNumber=transactionNumber;
 	}
-	public Long getOrderID() {
-		return orderID;
+	public Long getOrderid() {
+		return orderid;
 	}
-	public void setOrderID(Long orderID) {
-		this.orderID=orderID;
+	public void setOrderid(Long orderID) {
+		this.orderid=orderID;
 	}
-	public Long getCommodityID() {
-		return commodityID;
+	public Long getCommodityid() {
+		return commodityid;
 	}
-	public void setCommodityID(Long commodityID) {
-		this.commodityID=commodityID;
+	public void setCommodityid(Long commodityID) {
+		this.commodityid=commodityID;
 	}
 	public double getTransactionPrice() {
 		return transactionPrice;

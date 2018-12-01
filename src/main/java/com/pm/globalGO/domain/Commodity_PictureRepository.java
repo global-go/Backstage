@@ -6,5 +6,5 @@ public interface Commodity_PictureRepository extends JpaRepository<Commodity_Pic
 
 	public List<Commodity_Picture> findAll();
 
-	public List<Commodity_Picture> findByCommodityID(Long commodityID);
+	public List<Commodity_Picture> findByCommodityid(Long commodityID);
 }

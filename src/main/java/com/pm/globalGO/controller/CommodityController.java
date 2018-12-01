@@ -54,15 +54,15 @@ public class CommodityController{
 				commodity.setPictureNumber(images.size());
 				commodityRepository.save(commodity);
 				
-				Long commodityid=commodity.getCommodityID();
+				Long commodityid=commodity.getCommodityid();
 				int totalCount=images.size();			
 				for(int i=0;i<totalCount;i++) {
 					Long imageid=images.getLongValue(i);
 					
 					Commodity_Picture commodity_picture=new Commodity_Picture();
-					commodity_picture.setCommodityID(commodityid);
-					commodity_picture.setPictureOrder(i);
-					commodity_picture.setPictureIndex(imageid);
+					commodity_picture.setCommodityid(commodityid);
+					commodity_picture.setPictureorder(i);
+					commodity_picture.setPictureid(imageid);
 					commodity_pictureRepository.save(commodity_picture);
 				}
 				

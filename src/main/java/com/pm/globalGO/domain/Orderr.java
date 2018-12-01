@@ -14,9 +14,9 @@ public class Orderr implements Serializable{
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue
-	private Long orderID;
+	private Long orderid;
 	@Column(nullable = false)
-	private String userID;
+	private String userid;
 	@Column(nullable = false)
 	private Date time;
 	@Column(nullable = false)
@@ -33,25 +33,25 @@ public class Orderr implements Serializable{
 	}
 	public Orderr(Long orderID,String userID,Date time,String address,String addressee,String contact,String state) {
 		super();
-		this.orderID=orderID;
-		this.userID=userID;
+		this.orderid=orderID;
+		this.userid=userID;
 		this.time=time;
 		this.address=address;
 		this.addressee=addressee;
 		this.contact=contact;
 		this.state=state;
 	}
-	public Long getOrderID() {
-		return orderID;
+	public Long getOrderid() {
+		return orderid;
 	}
-	public void setOrderID(Long orderID) {
-		this.orderID=orderID;
+	public void setOrderid(Long orderID) {
+		this.orderid=orderID;
 	}
-	public String getUserID() {
-		return userID;
+	public String getUserid() {
+		return userid;
 	}
-	public void setUserID(String userID) {
-		this.userID=userID;
+	public void setUserid(String userID) {
+		this.userid=userID;
 	}
 	public Date getTime() {
 		return time;

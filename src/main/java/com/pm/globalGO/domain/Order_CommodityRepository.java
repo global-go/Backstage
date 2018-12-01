@@ -7,8 +7,8 @@ public interface Order_CommodityRepository extends JpaRepository<Order_Commodity
 
 	public List<Order_Commodity> findAll();
 
-	public List<Order_Commodity> findByOrderID(Long orderID);
+	public List<Order_Commodity> findByOrderid(Long orderID);
 
 	@Transactional
-	public void deleteByOrderID(Long orderID);
+	public void deleteByOrderid(Long orderID);
 }
