@@ -496,6 +496,7 @@ public class UserController{
 					order_CommodityRepository.deleteByOrderid(orderID);
 				}
 				orderRepository.deleteByUserid(userID);
+				userRepository.deleteByUserid(userID);
 				jsonRet.put("code", 0);
 				jsonRet.put("errMessage", "");
 			}
