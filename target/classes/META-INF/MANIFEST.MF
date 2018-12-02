@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: globalGO
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: Lujj
+Implementation-Vendor-Id: com.pm
+Build-Jdk: 1.8.0_151
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/globalGO
+Created-By: Maven Integration for Eclipse
+
