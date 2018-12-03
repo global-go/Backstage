@@ -43,6 +43,7 @@ public class CommodityController{
 		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
 		int token = jsonObject.getInteger("token");
 		String name = jsonObject.getString("name");
+		String category = jsonObject.getString("category");
 		double price = jsonObject.getDouble("price");
 		int stock = jsonObject.getInteger("stock");
 		String description = jsonObject.getString("description");
@@ -61,6 +62,7 @@ public class CommodityController{
 		if (user.getType().equals("admin")) {
 			Commodity commodity=new Commodity();
 			commodity.setCommodityName(name);
+			commodity.setCategory(category);
 			commodity.setPrice(price);
 			commodity.setStock(stock);
 			commodity.setDescription(description);
@@ -88,6 +90,7 @@ public class CommodityController{
 			JSONObject commodityInfo = new JSONObject();
 			commodityInfo.put("id",commodity.getCommodityid());
 			commodityInfo.put("name",commodity.getCommodityName());
+			commodityInfo.put("categoty", commodity.getCategory());
 			commodityInfo.put("price", commodity.getPrice());
 			commodityInfo.put("stock", commodity.getStock());
 			commodityInfo.put("description", commodity.getDescription());
@@ -114,6 +117,7 @@ public class CommodityController{
 		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
 		int token = jsonObject.getInteger("token");
 		String name = jsonObject.getString("name");
+		String category = jsonObject.getString("category");
 		double price = jsonObject.getDouble("price");
 		int stock = jsonObject.getInteger("stock");
 		String description = jsonObject.getString("description");
@@ -132,6 +136,7 @@ public class CommodityController{
 		if (user.getType().equals("admin")) {
 			Commodity commodity= commodityRepository.findByCommodityid(commodityid);
 			commodity.setCommodityName(name);
+			commodity.setCategory(category);
 			commodity.setPrice(price);
 			commodity.setStock(stock);
 			commodity.setDescription(description);
@@ -158,6 +163,7 @@ public class CommodityController{
 			JSONObject commodityInfo = new JSONObject();
 			commodityInfo.put("id",commodity.getCommodityid());
 			commodityInfo.put("name",commodity.getCommodityName());
+			commodityInfo.put("category", commodity.getCategory());
 			commodityInfo.put("price", commodity.getPrice());
 			commodityInfo.put("stock", commodity.getStock());
 			commodityInfo.put("description", commodity.getDescription());
@@ -187,6 +193,7 @@ public class CommodityController{
 			Commodity commodity=commodities.get(i);
 			
 			listitem.put("name",commodity.getCommodityName());
+			listitem.put("category", commodity.getCategory());
 			listitem.put("price",commodity.getPrice());
 			listitem.put("stock",commodity.getStock());
 			listitem.put("description",commodity.getDescription());

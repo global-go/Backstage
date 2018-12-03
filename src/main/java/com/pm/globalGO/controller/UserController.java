@@ -272,6 +272,7 @@ public class UserController{
 					Commodity commodity=commodities.get(i);
 					
 					listitem.put("name",commodity.getCommodityName());
+					listitem.put("category", commodity.getCategory());
 					listitem.put("price",commodity.getPrice());
 					int stock=commodity.getStock();
 					listitem.put("stock",stock);

@@ -19,6 +19,9 @@ public class Commodity implements Serializable{
 	private String commodityName;
 	
 	@Column(nullable = false)
+	private String category;
+	
+	@Column(nullable = false)
 	private double price;
 	
 	@Column(nullable = false)
@@ -37,15 +40,6 @@ public class Commodity implements Serializable{
 		super();
 	}
 	
-	public Commodity(Long commodityID,String commodityName,double price,int stock,String description,int pictureNumber) {
-		super();
-		this.commodityid=commodityID;
-		this.commodityName=commodityName;
-		this.price=price;
-		this.stock=stock;
-		this.description=description;
-		this.pictureNumber=pictureNumber;
-	}
 
 	public Long getCommodityid() {
 		return commodityid;
@@ -60,6 +54,15 @@ public class Commodity implements Serializable{
 	public void setCommodityName(String commodityName) {
 		this.commodityName=commodityName;
 	}	
+	
+	public String getCategory() {
+		return category;
+	}
+	
+	public void setCategory(String category) {
+		this.category=category;
+	}
+	
 	
 	public double getPrice() {
 		return price;
