@@ -28,9 +28,6 @@ public class Commodity implements Serializable{
 	private int stock;
 	
 	@Column(nullable = false)
-	private String classification;
-	
-	@Column(nullable = false)
 	private String description;
 	
 	@Column(nullable = false)
