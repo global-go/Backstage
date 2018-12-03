@@ -122,7 +122,7 @@ public class UserController{
 		User user=userRepository.findByUserid(userID);
 		if (user==null) {
 			String hashPassword = hash(password);
-			User newUser=new User(userID,"User"+userID,hashPassword,pictureRepository.findByPictureid(new Long(0)).getPictureUrl(),1000.0,"user");
+			User newUser=new User(userID,"User"+userID,hashPassword,pictureRepository.findByPictureid(new Long(1)).getPictureUrl(),1000.0,"user");
 			userRepository.save(newUser);
 			int newToken=setTokenForUserID(userID);
 			ret.put("code", 0);
