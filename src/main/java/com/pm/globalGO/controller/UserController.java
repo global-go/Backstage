@@ -267,9 +267,12 @@ public class UserController{
 				JSONArray commoditylist=new JSONArray();
 				int notSoldOutCount=0;
 				int maxCount=50;//随便定的，再议
+				int totalCount=0;
 				for(int i=0;i<commodities.size();i++) {
-					JSONObject listitem=new JSONObject();
 					Commodity commodity=commodities.get(i);
+					if (commodity.getStock()<0)
+						continue;
+					JSONObject listitem=new JSONObject();
 					
 					listitem.put("name",commodity.getCommodityName());
 					listitem.put("category", commodity.getCategory());
@@ -290,14 +293,12 @@ public class UserController{
 					
 					listitem.put("images",images);
 					commoditylist.add(listitem);
-									
-
-					if(stock>0) {
-					     notSoldOutCount++;
-					}		
+					if(stock>0) 
+					     notSoldOutCount++;	
+					++totalCount;		
 				}
 				
-				commodityInfo.put("totalCount",commodities.size());
+				commodityInfo.put("totalCount",totalCount);
 				commodityInfo.put("notSoldOutCount",notSoldOutCount);
 				commodityInfo.put("maxCount",maxCount);
 				commodityInfo.put("list",commoditylist);
