@@ -229,6 +229,8 @@ public class CommodityController{
 			Commodity commodity=commodities.get(i);
 			if (commodity.getStock()<0)
 				continue;
+			
+			listitem.put("id", commodity.getCommodityid());
 			listitem.put("name",commodity.getCommodityName());
 			listitem.put("category", commodity.getCategory());
 			listitem.put("price",commodity.getPrice());

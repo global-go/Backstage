@@ -274,6 +274,7 @@ public class UserController{
 						continue;
 					JSONObject listitem=new JSONObject();
 					
+					listitem.put("id",commodity.getCommodityid());
 					listitem.put("name",commodity.getCommodityName());
 					listitem.put("category", commodity.getCategory());
 					listitem.put("price",commodity.getPrice());
