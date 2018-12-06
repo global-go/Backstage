@@ -40,6 +40,7 @@ public class PictureController{
 		return ret.toString();
 	}
 	
+	//上传图片
 	@ResponseBody
 	@PostMapping(path = "/v1/images")
 	public String uploadPic(@RequestParam("image") MultipartFile file) throws FileNotFoundException {
