@@ -20,6 +20,7 @@ import com.pm.globalGO.domain.CartRepository;
 import com.pm.globalGO.domain.Commodity;
 import com.pm.globalGO.domain.CommodityRepository;
 import com.pm.globalGO.domain.OrderrRepository;
+import com.pm.globalGO.domain.Picture;
 import com.pm.globalGO.domain.Orderr;
 import com.pm.globalGO.domain.PictureRepository;
 import com.pm.globalGO.domain.User;
@@ -286,8 +287,10 @@ public class UserController{
 					List<Commodity_Picture> pictures=commodity_pictureRepository.findByCommodityid(commodity.getCommodityid());
 					for(int j=0;j<pictures.size();j++) {
 						JSONObject image=new JSONObject();
-					    image.put("id",pictures.get(j).getPictureorder());
-					    image.put("url",pictureRepository.findByPictureid(pictures.get(j).getPictureid()).getPictureUrl());
+						Commodity_Picture picture = pictures.get(j);
+						image.put("id",picture.getPictureid());
+					    image.put("order",picture.getPictureorder());
+					    image.put("url",pictureRepository.findByPictureid(picture.getPictureid()).getPictureUrl());
 					    images.add(image);
 					    
 					}
