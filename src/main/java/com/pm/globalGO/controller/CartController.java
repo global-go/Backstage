@@ -14,6 +14,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.pm.globalGO.domain.Cart;
 import com.pm.globalGO.domain.CartRepository;
+import com.pm.globalGO.domain.Commodity;
+import com.pm.globalGO.domain.CommodityRepository;
+import com.pm.globalGO.domain.Commodity_Picture;
+import com.pm.globalGO.domain.Commodity_PictureRepository;
+import com.pm.globalGO.domain.PictureRepository;
 import com.pm.globalGO.domain.User;
 import com.pm.globalGO.domain.UserRepository;
 
@@ -22,6 +27,15 @@ public class CartController{
 
 	@Autowired
 	private CartRepository cartRepository;
+	
+	@Autowired
+	private CommodityRepository commodityRepository;
+	
+	@Autowired
+	private Commodity_PictureRepository commodity_pictureRepository;
+	
+	@Autowired
+	private PictureRepository pictureRepository; 
 	
 	//修改购物车
 	@ResponseBody
@@ -92,6 +106,23 @@ public class CartController{
 				JSONObject cartListItem= new JSONObject();
 				cartListItem.put("commodityID", cart.getCommodityid());
 				cartListItem.put("number", cart.getCartNumber());
+				Commodity commodity = commodityRepository.findByCommodityid(cart.getCommodityid());
+				cartListItem.put("name", commodity.getCommodityName());
+				cartListItem.put("category",commodity.getCategory());
+				cartListItem.put("price",commodity.getPrice());
+				cartListItem.put("stock",commodity.getStock());
+				cartListItem.put("description", commodity.getDescription());
+				JSONArray imagesArray = new JSONArray();
+				List<Commodity_Picture> images = commodity_pictureRepository.findByCommodityid(commodity.getCommodityid());
+				for (int j=0;j<images.size();j++) {
+					JSONObject imagesArrayItem = new JSONObject();
+					Commodity_Picture pic = images.get(j);
+					imagesArrayItem.put("id",pic.getPictureid());
+					imagesArrayItem.put("order",pic.getPictureorder());
+					imagesArrayItem.put("url", pictureRepository.findByPictureid(pic.getPictureid()).getPictureUrl());
+					imagesArray.add(imagesArrayItem);
+				}
+				cartListItem.put("images", imagesArray);
 				cartList.add(cartListItem);
 			}
 			jsonRet.put("cart", cartList);
