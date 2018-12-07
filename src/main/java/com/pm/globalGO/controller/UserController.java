@@ -226,7 +226,9 @@ public class UserController{
 					listitem.put("contact",order.getContact());
 					
 					JSONObject userInfo1=new JSONObject();
-					userInfo1.put("nickname",userRepository.findByUserid(order.getUserid()).getNickname());
+					User user=userRepository.findByUserid(order.getUserid());
+					userInfo1.put("nickname",user.getNickname());
+					userInfo1.put("id", user.getUserid());
 					listitem.put("userInfo",userInfo1);
 					
 					JSONArray commodityList = new JSONArray();
@@ -267,7 +269,7 @@ public class UserController{
 				List<Commodity> commodities=commodityRepository.findAll();//在售商品
 				JSONArray commoditylist=new JSONArray();
 				int notSoldOutCount=0;
-				int maxCount=50;//随便定的，再议
+				int maxCount=50;
 				int totalCount=0;
 				for(int i=0;i<commodities.size();i++) {
 					Commodity commodity=commodities.get(i);

@@ -1,10 +1,14 @@
 package com.pm.globalGO.controller;
 import com.pm.globalGO.domain.Cart;
+import com.pm.globalGO.domain.Commodity;
 import com.pm.globalGO.domain.CommodityRepository;
+import com.pm.globalGO.domain.Commodity_Picture;
+import com.pm.globalGO.domain.Commodity_PictureRepository;
 import com.pm.globalGO.domain.Order_Commodity;
 import com.pm.globalGO.domain.Order_CommodityRepository;
 import com.pm.globalGO.domain.Orderr;
 import com.pm.globalGO.domain.OrderrRepository;
+import com.pm.globalGO.domain.PictureRepository;
 import com.pm.globalGO.domain.User;
 import com.pm.globalGO.domain.UserRepository;
 import com.alibaba.fastjson.JSONArray;
@@ -46,6 +50,12 @@ public class OrderrController{
 	
 	@Autowired
 	private CommodityRepository commodityRepository;
+	
+	@Autowired
+	private Commodity_PictureRepository commodity_pictureRepository;
+	
+	@Autowired
+	private PictureRepository pictureRepository;
 	
 	//创建订单
 	@ResponseBody
@@ -128,12 +138,27 @@ public class OrderrController{
 				orderArrayItem.put("address",order.getAddress());
 				orderArrayItem.put("addressee", order.getAddressee());
 				orderArrayItem.put("contact", order.getContact());
+				orderArrayItem.put("state", order.getState());
 				JSONArray commodityArray = new JSONArray();
 				List<Order_Commodity> ocList = order_commodityRepository.findByOrderid(order.getOrderid());
 				for (int j=0;j<ocList.size();j++) {
 					Order_Commodity order_commodity = ocList.get(j);
+					Commodity commodity = commodityRepository.findByCommodityid(order_commodity.getCommodityid());
 					JSONObject commodityArrayItem = new JSONObject();
-					commodityArrayItem.put("commodityID", order_commodity.getCommodityid());
+					commodityArrayItem.put("commodityID", commodity.getCommodityid());
+					commodityArrayItem.put("name", commodity.getCommodityName());
+					commodityArrayItem.put("price", commodity.getPrice());
+					List<Commodity_Picture> commodity_pictures = commodity_pictureRepository.findByCommodityid(commodity.getCommodityid());
+					JSONArray images = new JSONArray();
+					for (int k=0;k<images.size();k++) {
+						Commodity_Picture commodity_picture = commodity_pictures.get(k);
+						JSONObject imagesItem = new JSONObject();
+						imagesItem.put("id", commodity_picture.getCommodityid());
+						imagesItem.put("order",commodity_picture.getPictureorder());
+						imagesItem.put("url", pictureRepository.findByPictureid(commodity_picture.getPictureid()).getPictureUrl());
+						images.add(imagesItem);
+					}
+					commodityArrayItem.put("images",images);
 					commodityArrayItem.put("transactionValue",order_commodity.getTransactionPrice());
 					commodityArrayItem.put("number", order_commodity.getTransactionNumber());
 					commodityArray.add(commodityArrayItem);
