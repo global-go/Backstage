@@ -8,6 +8,7 @@ import com.pm.globalGO.domain.Order_Commodity;
 import com.pm.globalGO.domain.Order_CommodityRepository;
 import com.pm.globalGO.domain.Orderr;
 import com.pm.globalGO.domain.OrderrRepository;
+import com.pm.globalGO.domain.Picture;
 import com.pm.globalGO.domain.PictureRepository;
 import com.pm.globalGO.domain.User;
 import com.pm.globalGO.domain.UserRepository;
@@ -80,29 +81,92 @@ public class OrderrController{
 			String contact = jsonObject.getString("contact");
 			JSONArray orderArray = jsonObject.getJSONArray("order");
 			
+			double totalPrice=0;
+			JSONArray lack = new JSONArray();
+			for (int i=0;i<orderArray.size();i++) {
+				JSONObject orderArrayItem = orderArray.getJSONObject(i);
+				Long commodityID=orderArrayItem.getLong("commodityID");
+				int number=orderArrayItem.getInteger("number");
+				Commodity commodity = commodityRepository.findByCommodityid(commodityID);
+				totalPrice+=commodity.getPrice()*number;
+				if (commodity.getStock()<number) {
+					lack.add(commodityID);
+				}
+			}	
+			
+			if (lack.size()>0) {
+				jsonRet.put("code", -1);
+				jsonRet.put("errMessage", "部分所选商品库存余量不足");
+				jsonRet.put("lack", lack);
+				return jsonRet.toJSONString();
+			}
+			
+			User user=userRepository.findByUserid(userID);
+			if (totalPrice>user.getBalance()) {
+				jsonRet.put("code",-1);
+				jsonRet.put("errMessage", "用户余额不足");
+				return jsonRet.toJSONString();
+			}
+			
+			user.setBalance(user.getBalance()-totalPrice);
+			
+			JSONObject order = new JSONObject();
+			
 			Orderr neworder = new Orderr();
 			neworder.setUserid(userID);
 			neworder.setAddress(address);
 			neworder.setAddressee(addressee);
 			neworder.setContact(contact);
 			neworder.setState("pending");
-			System.out.println(userID+" "+address+" "+addressee+" ");
 			neworder.setTime(new Timestamp(System.currentTimeMillis()));
 			orderrRepository.save(neworder);
+			
+			order.put("orderid", neworder.getOrderid());
+			order.put("userid",neworder.getUserid());
+			order.put("time",neworder.getTime());
+			order.put("address", neworder.getAddress());
+			order.put("addressee", neworder.getAddressee());
+			order.put("contact", neworder.getContact());
+			order.put("state", neworder.getState());
+			
+			JSONArray commodities = new JSONArray();
+			
 			Long orderid=neworder.getOrderid();
 			for (int i=0;i<orderArray.size();i++) {
 				JSONObject orderArrayItem = orderArray.getJSONObject(i);
+				JSONObject commotitiesItem = new JSONObject();
 				Long commodityID=orderArrayItem.getLong("commodityID");
 				int number=orderArrayItem.getInteger("number");
+				Commodity commodity = commodityRepository.findByCommodityid(commodityID);
+				
+				commodity.setStock(commodity.getStock()-number);
+				
 				Order_Commodity newoc=new Order_Commodity();
 				newoc.setOrderid(orderid);
 				newoc.setCommodityid(commodityID);
 				newoc.setTransactionNumber(number);
-				newoc.setTransactionPrice(commodityRepository.findByCommodityid(commodityID).getPrice());
+				newoc.setTransactionPrice(commodity.getPrice());
 				order_commodityRepository.save(newoc);
+				
+				commotitiesItem.put("commodityID",commodity.getCommodityid());
+				commotitiesItem.put("name", commodity.getCommodityName());
+				commotitiesItem.put("price", commodity.getPrice());
+				JSONArray images = new JSONArray();
+				List<Commodity_Picture> cp = commodity_pictureRepository.findByCommodityid(commodityID);
+				for (int j=0;j<cp.size();j++) {
+					JSONObject imagesItem=new JSONObject();
+					imagesItem.put("id", cp.get(j).getPictureid());
+					imagesItem.put("order",cp.get(j).getPictureorder());
+					imagesItem.put("url",pictureRepository.findByPictureid( cp.get(j).getPictureid()).getPictureUrl());
+					images.add(imagesItem);
+				}
+				commotitiesItem.put("images", images);
+				commodities.add(commotitiesItem);
 			}
+			order.put("commodities",commodities);
 			jsonRet.put("code", 0);
 			jsonRet.put("errMessage", "");
+			jsonRet.put("order", order);
 		}else {
 			jsonRet.put("code", -1);
 			jsonRet.put("errMessage", "错误的id");
