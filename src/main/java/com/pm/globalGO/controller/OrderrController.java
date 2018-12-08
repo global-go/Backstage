@@ -71,6 +71,14 @@ public class OrderrController{
 			String contact = jsonObject.getString("contact");
 			JSONArray orderArray = jsonObject.getJSONArray("order");
 			
+			
+			//检查订单内是否为空
+			if (orderArray.size()==0) {
+				jsonRet.put("code", -1);
+				jsonRet.put("errMessage", "订单为空");
+				return jsonRet.toJSONString();
+			}
+			
 			//检查商品库存
 			double totalPrice=0;
 			JSONArray lack = new JSONArray();
@@ -206,7 +214,7 @@ public class OrderrController{
 					commodityArrayItem.put("price", commodity.getPrice());
 					List<Commodity_Picture> commodity_pictures = commodity_pictureRepository.findByCommodityid(commodity.getCommodityid());
 					JSONArray images = new JSONArray();
-					for (int k=0;k<images.size();k++) {
+					for (int k=0;k<commodity_pictures.size();k++) {
 						Commodity_Picture commodity_picture = commodity_pictures.get(k);
 						JSONObject imagesItem = new JSONObject();
 						imagesItem.put("id", commodity_picture.getCommodityid());
