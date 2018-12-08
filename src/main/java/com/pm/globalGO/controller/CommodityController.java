@@ -110,110 +110,110 @@ public class CommodityController{
 	
 	
 	//修改商品
-		@ResponseBody
-		@PutMapping(path = "/v1/admin/commodity/{commodityid}")
-		public String modifyCommodity(
-				@PathVariable(name = "commodityid") Long commodityid,
-				@RequestBody String jsonstr) {
-			System.out.println("modify commodity");
-			
-			JSONObject jsonRet = new JSONObject();
-			JSONObject jsonObject = JSONObject.parseObject(jsonstr);
-			int token = jsonObject.getInteger("token");
-			String name = jsonObject.getString("name");
-			String category = jsonObject.getString("category");
-			double price = jsonObject.getDouble("price");
-			int stock = jsonObject.getInteger("stock");
-			String description = jsonObject.getString("description");
-			
-			JSONArray images = jsonObject.getJSONArray("images");//图片数组
+	@ResponseBody
+	@PutMapping(path = "/v1/admin/commodity/{commodityid}")
+	public String modifyCommodity(
+			@PathVariable(name = "commodityid") Long commodityid,
+			@RequestBody String jsonstr) {
+		System.out.println("modify commodity");
 		
+		JSONObject jsonRet = new JSONObject();
+		JSONObject jsonObject = JSONObject.parseObject(jsonstr);
+		int token = jsonObject.getInteger("token");
+		String name = jsonObject.getString("name");
+		String category = jsonObject.getString("category");
+		double price = jsonObject.getDouble("price");
+		int stock = jsonObject.getInteger("stock");
+		String description = jsonObject.getString("description");
+		
+		JSONArray images = jsonObject.getJSONArray("images");//图片数组
+	
+		
+		String userID = UserController.getUserIDByToken(token);
+		if (userID==null) {
+			jsonRet.put("code",-1);
+			jsonRet.put("errMessage","token失效,请重新登陆");
+			return jsonRet.toJSONString();
+		}
+		User user=userRepository.findByUserid(userID);
+		
+		if (user.getType().equals("admin")) {
+			Commodity commodity= commodityRepository.findByCommodityid(commodityid);
+			commodity.setCommodityName(name);
+			commodity.setCategory(category);
+			commodity.setPrice(price);
+			commodity.setStock(stock);
+			commodity.setDescription(description);
+			commodity.setPictureNumber(images.size());
+			commodityRepository.save(commodity);
 			
-			String userID = UserController.getUserIDByToken(token);
-			if (userID==null) {
-				jsonRet.put("code",-1);
-				jsonRet.put("errMessage","token失效,请重新登陆");
-				return jsonRet.toJSONString();
-			}
-			User user=userRepository.findByUserid(userID);
+			commodity_pictureRepository.deleteByCommodityid(commodityid);
+			JSONArray imageArray = new JSONArray();
 			
-			if (user.getType().equals("admin")) {
-				Commodity commodity= commodityRepository.findByCommodityid(commodityid);
-				commodity.setCommodityName(name);
-				commodity.setCategory(category);
-				commodity.setPrice(price);
-				commodity.setStock(stock);
-				commodity.setDescription(description);
-				commodity.setPictureNumber(images.size());
-				commodityRepository.save(commodity);
-				
-				commodity_pictureRepository.deleteByCommodityid(commodityid);
-				JSONArray imageArray = new JSONArray();
-				
-				for(int i=0;i<images.size();i++) {
-					Long imageid=images.getLongValue(i);
-					Commodity_Picture commodity_picture=new Commodity_Picture();
-					commodity_picture.setCommodityid(commodityid);
-					commodity_picture.setPictureorder(i);
-					commodity_picture.setPictureid(imageid);
-					commodity_pictureRepository.save(commodity_picture);
-					JSONObject imageItem=new JSONObject();
-					imageItem.put("id", commodity_picture.getPictureorder());
-					imageItem.put("url",pictureRepository.findByPictureid(commodity_picture.getPictureid()).getPictureUrl());
-					imageArray.add(imageItem);
-				}
-				jsonRet.put("code",0);
-				jsonRet.put("errMessage","");
-				JSONObject commodityInfo = new JSONObject();
-				commodityInfo.put("id",commodity.getCommodityid());
-				commodityInfo.put("name",commodity.getCommodityName());
-				commodityInfo.put("category", commodity.getCategory());
-				commodityInfo.put("price", commodity.getPrice());
-				commodityInfo.put("stock", commodity.getStock());
-				commodityInfo.put("description", commodity.getDescription());
-				commodityInfo.put("images",imageArray);
-				jsonRet.put("commodity", commodityInfo);
+			for(int i=0;i<images.size();i++) {
+				Long imageid=images.getLongValue(i);
+				Commodity_Picture commodity_picture=new Commodity_Picture();
+				commodity_picture.setCommodityid(commodityid);
+				commodity_picture.setPictureorder(i);
+				commodity_picture.setPictureid(imageid);
+				commodity_pictureRepository.save(commodity_picture);
+				JSONObject imageItem=new JSONObject();
+				imageItem.put("id", commodity_picture.getPictureorder());
+				imageItem.put("url",pictureRepository.findByPictureid(commodity_picture.getPictureid()).getPictureUrl());
+				imageArray.add(imageItem);
 			}
-			else {
-				//在响应json中加入错误信息
-				jsonRet.put("code",-1);
-				jsonRet.put("errMessage","不具备权限");
-			}
+			jsonRet.put("code",0);
+			jsonRet.put("errMessage","");
+			JSONObject commodityInfo = new JSONObject();
+			commodityInfo.put("id",commodity.getCommodityid());
+			commodityInfo.put("name",commodity.getCommodityName());
+			commodityInfo.put("category", commodity.getCategory());
+			commodityInfo.put("price", commodity.getPrice());
+			commodityInfo.put("stock", commodity.getStock());
+			commodityInfo.put("description", commodity.getDescription());
+			commodityInfo.put("images",imageArray);
+			jsonRet.put("commodity", commodityInfo);
+		}
+		else {
+			//在响应json中加入错误信息
+			jsonRet.put("code",-1);
+			jsonRet.put("errMessage","不具备权限");
+		}
+		return jsonRet.toJSONString();
+	}
+		
+	//删除商品
+	@ResponseBody
+	@DeleteMapping(path = "/v1/admin/commodity/{commodityid}")
+	public String deleteCommodity(
+			@PathVariable(name = "commodityid") Long commodityid,
+			@RequestParam("token") int token) {
+		System.out.println("delete commodity");
+		
+		JSONObject jsonRet = new JSONObject();
+		String userID = UserController.getUserIDByToken(token);
+		if (userID==null) {
+			jsonRet.put("code",-1);
+			jsonRet.put("errMessage","token失效,请重新登陆");
 			return jsonRet.toJSONString();
 		}
 		
-		//删除商品
-		@ResponseBody
-		@DeleteMapping(path = "/v1/admin/commodity/{commodityid}")
-		public String deleteCommodity(
-				@PathVariable(name = "commodityid") Long commodityid,
-				@RequestParam("token") int token) {
-			System.out.println("delete commodity");
-			
-			JSONObject jsonRet = new JSONObject();
-			String userID = UserController.getUserIDByToken(token);
-			if (userID==null) {
-				jsonRet.put("code",-1);
-				jsonRet.put("errMessage","token失效,请重新登陆");
-				return jsonRet.toJSONString();
-			}
-			
-			User user=userRepository.findByUserid(userID);
-			if (user.getType().equals("admin")) {
-				Commodity commodity= commodityRepository.findByCommodityid(commodityid);
-				commodity.setStock(-1);
-				commodityRepository.save(commodity);
-				jsonRet.put("code",0);
-				jsonRet.put("errMessage","");
-			}
-			else {
-				//在响应json中加入错误信息
-				jsonRet.put("code",-1);
-				jsonRet.put("errMessage","不具备权限");
-			}
-			return jsonRet.toJSONString();
+		User user=userRepository.findByUserid(userID);
+		if (user.getType().equals("admin")) {
+			Commodity commodity= commodityRepository.findByCommodityid(commodityid);
+			commodity.setStock(-1);
+			commodityRepository.save(commodity);
+			jsonRet.put("code",0);
+			jsonRet.put("errMessage","");
 		}
-		
+		else {
+			//在响应json中加入错误信息
+			jsonRet.put("code",-1);
+			jsonRet.put("errMessage","不具备权限");
+		}
+		return jsonRet.toJSONString();
+	}
+	
 	//首页信息
 	@ResponseBody
 	@GetMapping(path = "/v1/index/info")

@@ -1,5 +1,4 @@
 package com.pm.globalGO.controller;
-import com.pm.globalGO.domain.Cart;
 import com.pm.globalGO.domain.Commodity;
 import com.pm.globalGO.domain.CommodityRepository;
 import com.pm.globalGO.domain.Commodity_Picture;
@@ -8,20 +7,13 @@ import com.pm.globalGO.domain.Order_Commodity;
 import com.pm.globalGO.domain.Order_CommodityRepository;
 import com.pm.globalGO.domain.Orderr;
 import com.pm.globalGO.domain.OrderrRepository;
-import com.pm.globalGO.domain.Picture;
 import com.pm.globalGO.domain.PictureRepository;
 import com.pm.globalGO.domain.User;
 import com.pm.globalGO.domain.UserRepository;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONReader;
-import com.pm.globalGO.controller.ResultEnum;
-
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
-
-import javax.print.attribute.standard.DateTimeAtCompleted;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -81,6 +71,7 @@ public class OrderrController{
 			String contact = jsonObject.getString("contact");
 			JSONArray orderArray = jsonObject.getJSONArray("order");
 			
+			//检查商品库存
 			double totalPrice=0;
 			JSONArray lack = new JSONArray();
 			for (int i=0;i<orderArray.size();i++) {
@@ -101,6 +92,7 @@ public class OrderrController{
 				return jsonRet.toJSONString();
 			}
 			
+			//检查用户余额
 			User user=userRepository.findByUserid(userID);
 			if (totalPrice>user.getBalance()) {
 				jsonRet.put("code",-1);

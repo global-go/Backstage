@@ -19,8 +19,7 @@ import com.pm.globalGO.domain.CommodityRepository;
 import com.pm.globalGO.domain.Commodity_Picture;
 import com.pm.globalGO.domain.Commodity_PictureRepository;
 import com.pm.globalGO.domain.PictureRepository;
-import com.pm.globalGO.domain.User;
-import com.pm.globalGO.domain.UserRepository;
+
 
 @RestController
 public class CartController{
@@ -69,9 +68,6 @@ public class CartController{
 					cart.setUserid(userID);
 				}
 				cart.setCartNumber(number);
-				//System.out.println(cart.getUserid());
-				//System.out.println(cart.getCommodityid());
-				//System.out.println(cart.getCartNumber());
 				cartRepository.save(cart);
 			}
 			jsonRet.put("code", 0);
