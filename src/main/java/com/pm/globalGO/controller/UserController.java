@@ -53,6 +53,9 @@ public class UserController{
 	@Autowired
 	private PictureRepository pictureRepository;
 	
+	@Autowired
+	private OrderrRepository orderrRepository;
+	
 	//通过token识别用户
 	static String getUserIDByToken(int token) {
 		String userID = tokenMap.get(token);
@@ -146,7 +149,17 @@ public class UserController{
 				ret.put("code",0);
 				ret.put("errMessage","");
 				ret.put("token",newToken);
-				ret.put("unfinishedCount",0);
+				
+				//统计未完成订单数
+				int unfinishedCount=0;
+				List<Orderr> orderList = orderrRepository.findByUserid(userID);
+				for (int i=0;i<orderList.size();i++) {
+					if (!orderList.get(i).getState().equals("finished")) {
+						++unfinishedCount;
+					}
+				}
+				
+				ret.put("unfinishedCount",unfinishedCount);
 				JSONObject userInfo = new JSONObject();
 				userInfo.put("id", user.getUserid());
 				userInfo.put("avatar", user.getUserPicture());

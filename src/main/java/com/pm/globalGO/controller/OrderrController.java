@@ -123,7 +123,7 @@ public class OrderrController{
 			
 			order.put("orderid", neworder.getOrderid());
 			order.put("userid",neworder.getUserid());
-			order.put("time",neworder.getTime());
+			order.put("time",neworder.getTime().toString());
 			order.put("address", neworder.getAddress());
 			order.put("addressee", neworder.getAddressee());
 			order.put("contact", neworder.getContact());

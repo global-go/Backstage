@@ -1,4 +1,6 @@
 package com.pm.globalGO.controller;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -106,7 +108,7 @@ public class SysAdminController{
 					Orderr order=orders.get(i);
 					
 					listitem.put("id",order.getOrderid());
-					listitem.put("time",order.getTime());
+					listitem.put("time",order.getTime().toString());
 					listitem.put("address",order.getAddress());
 					listitem.put("addressee",order.getAddressee());
 					listitem.put("contact",order.getContact());
